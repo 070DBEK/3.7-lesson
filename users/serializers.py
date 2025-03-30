@@ -19,38 +19,28 @@ class RegisterSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
-        return User.objects.create_user(**validated_data)
+        password = validated_data.pop('password', None)
+        user = User(**validated_data)
+        if password:
+            user.set_password(password)
+        user.save()
+        return user
 
 
 class LoginSerializer(serializers.Serializer):
-    username = serializers.CharField(max_length=255, min_length=3)
-    password = serializers.CharField(max_length=68, min_length=6, write_only=True)
-    tokens = serializers.SerializerMethodField()
-
-    class Meta:
-        model = User
-        fields = ['username', 'password', 'tokens']
-
-    def get_tokens(self, obj):
-        user = User.objects.get(username=obj['username'])
-        return user.tokens()
+    username = serializers.CharField()
+    password = serializers.CharField(write_only=True)
 
     def validate(self, attrs):
         username = attrs.get('username')
         password = attrs.get('password')
         user = authenticate(username=username, password=password)
-
         if not user:
-            raise AuthenticationFailed('Invalid credentials, try again')
-        if not user.is_active:
-            raise AuthenticationFailed('Account disabled, contact admin')
-
+            raise serializers.ValidationError("Invalid username or password.")
+        refresh = RefreshToken.for_user(user)
         return {
-            'email': user.email,
-            'username': user.username,
-            'date_of_birth': user.date_of_birth,
-            'gender': user.gender,
-            'tokens': user.tokens()
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
         }
 
 
@@ -65,10 +55,23 @@ class LogoutSerializer(serializers.Serializer):
         try:
             RefreshToken(self.token).blacklist()
         except TokenError:
-            self.fail('bad_token')
+            raise AuthenticationFailed("Invalid or expired token")
+
+
+class UserSerializer(serializers.ModelSerializer):
+    tokens = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'date_of_birth', 'gender', 'tokens']
+
+    def get_tokens(self, obj):
+        return obj.tokens()
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+
     class Meta:
         model = UserProfile
-        fields = ['user', 'height', 'weight', 'activity_level', 'goal']
+        fields = ['id', 'user', 'height', 'weight', 'activity_level', 'goal']
