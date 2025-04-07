@@ -1,77 +1,78 @@
 from rest_framework import serializers
-from django.contrib.auth import authenticate
-from rest_framework.exceptions import AuthenticationFailed
-from rest_framework_simplejwt.tokens import RefreshToken, TokenError
+from django.contrib.auth.password_validation import validate_password
 from .models import User, UserProfile
 
 
 class RegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(max_length=68, min_length=6, write_only=True)
+    password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
+    password2 = serializers.CharField(write_only=True, required=True)
 
     class Meta:
         model = User
-        fields = ['email', 'username', 'password', 'date_of_birth', 'gender']
+        fields = ('username', 'password', 'password2', 'email', 'first_name', 'last_name', 'date_of_birth', 'gender')
+        extra_kwargs = {
+            'first_name': {'required': True},
+            'last_name': {'required': True},
+            'email': {'required': True}
+        }
 
     def validate(self, attrs):
-        username = attrs.get('username', '')
-        if not username.isalnum():
-            raise serializers.ValidationError("Username must be alphanumeric.")
+        if attrs['password'] != attrs['password2']:
+            raise serializers.ValidationError({"password": "Parollar mos kelmadi."})
         return attrs
 
     def create(self, validated_data):
-        password = validated_data.pop('password', None)
-        user = User(**validated_data)
-        if password:
-            user.set_password(password)
+        validated_data.pop('password2')  # password2 kerak emas
+        user = User.objects.create_user(**validated_data)
+        user.set_password(validated_data['password'])  # Parolni hash qilish
         user.save()
         return user
 
 
-class LoginSerializer(serializers.Serializer):
-    username = serializers.CharField()
-    password = serializers.CharField(write_only=True)
-
-    def validate(self, attrs):
-        username = attrs.get('username')
-        password = attrs.get('password')
-        user = authenticate(username=username, password=password)
-        if not user:
-            raise serializers.ValidationError("Invalid username or password.")
-        refresh = RefreshToken.for_user(user)
-        return {
-            'refresh': str(refresh),
-            'access': str(refresh.access_token),
-        }
-
-
-class LogoutSerializer(serializers.Serializer):
-    refresh = serializers.CharField()
-
-    def validate(self, attrs):
-        self.token = attrs['refresh']
-        return attrs
-
-    def save(self, **kwargs):
-        try:
-            RefreshToken(self.token).blacklist()
-        except TokenError:
-            raise AuthenticationFailed("Invalid or expired token")
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = ['height', 'weight', 'activity_level', 'goal']
 
 
 class UserSerializer(serializers.ModelSerializer):
-    tokens = serializers.SerializerMethodField()
+    height = serializers.IntegerField(source='profile.height', required=False)
+    weight = serializers.IntegerField(source='profile.weight', required=False)
+    activity_level = serializers.CharField(source='profile.activity_level', required=False)
+    goal = serializers.CharField(source='profile.goal', required=False)
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'date_of_birth', 'gender', 'tokens']
+        fields = [
+            'id', 'username', 'email',
+            'first_name', 'last_name',
+            'date_of_birth', 'gender',
+            'height', 'weight', 'activity_level', 'goal'
+        ]
+        extra_kwargs = {
+            'username': {'read_only': True},
+            'email': {'required': True},
+            'first_name': {'required': False},
+            'last_name': {'required': False}
+        }
 
-    def get_tokens(self, obj):
-        return obj.tokens()
+    def update(self, instance, validated_data):
+        # Profil ma'lumotlarini ajratib olamiz
+        profile_data = {
+            'height': validated_data.pop('profile.height', None),
+            'weight': validated_data.pop('profile.weight', None),
+            'activity_level': validated_data.pop('profile.activity_level', None),
+            'goal': validated_data.pop('profile.goal', None)
+        }
 
+        # User ma'lumotlarini yangilaymiz
+        instance = super().update(instance, validated_data)
 
-class UserProfileSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
+        # Profil ma'lumotlarini yangilaymiz
+        profile, created = UserProfile.objects.get_or_create(user=instance)
+        for attr, value in profile_data.items():
+            if value is not None:
+                setattr(profile, attr, value)
+        profile.save()
 
-    class Meta:
-        model = UserProfile
-        fields = ['id', 'user', 'height', 'weight', 'activity_level', 'goal']
+        return instance
