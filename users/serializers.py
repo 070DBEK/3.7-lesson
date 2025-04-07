@@ -22,9 +22,9 @@ class RegisterSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
-        validated_data.pop('password2')  # password2 kerak emas
+        validated_data.pop('password2')
         user = User.objects.create_user(**validated_data)
-        user.set_password(validated_data['password'])  # Parolni hash qilish
+        user.set_password(validated_data['password'])
         user.save()
         return user
 
@@ -49,30 +49,14 @@ class UserSerializer(serializers.ModelSerializer):
             'date_of_birth', 'gender',
             'height', 'weight', 'activity_level', 'goal'
         ]
-        extra_kwargs = {
-            'username': {'read_only': True},
-            'email': {'required': True},
-            'first_name': {'required': False},
-            'last_name': {'required': False}
-        }
 
     def update(self, instance, validated_data):
-        # Profil ma'lumotlarini ajratib olamiz
-        profile_data = {
-            'height': validated_data.pop('profile.height', None),
-            'weight': validated_data.pop('profile.weight', None),
-            'activity_level': validated_data.pop('profile.activity_level', None),
-            'goal': validated_data.pop('profile.goal', None)
-        }
-
-        # User ma'lumotlarini yangilaymiz
-        instance = super().update(instance, validated_data)
-
-        # Profil ma'lumotlarini yangilaymiz
+        profile_data = validated_data.pop('profile', {})
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
         profile, created = UserProfile.objects.get_or_create(user=instance)
         for attr, value in profile_data.items():
-            if value is not None:
-                setattr(profile, attr, value)
+            setattr(profile, attr, value)
         profile.save()
-
         return instance

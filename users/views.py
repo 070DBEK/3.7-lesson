@@ -39,10 +39,11 @@ class UserProfileView(APIView):
         serializer = UserSerializer(user)
         return Response(serializer.data)
 
-    def put(self, request):
-        user = request.user
+    def put(self, request, username):
+        user = get_object_or_404(User, username=username)
+        if request.user != user and not request.user.is_staff:
+            return Response({"detail": "Ruxsat yo‘q."}, status=status.HTTP_403_FORBIDDEN)
         serializer = UserSerializer(user, data=request.data, partial=True)
-
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)

@@ -1,46 +1,42 @@
 from django.contrib import admin
 from .models import Exercise, Workout, WorkoutExercise, Food, Meal, MealFood, HealthMetrics
 
+# Inlines
+class WorkoutExerciseInline(admin.TabularInline):
+    model = WorkoutExercise
+    extra = 1
 
-@admin.register(Exercise)
-class ExerciseAdmin(admin.ModelAdmin):
-    list_display = ('name', 'category', 'calories_burned_per_hour')
-    search_fields = ('name', 'category')
+class MealFoodInline(admin.TabularInline):
+    model = MealFood
+    extra = 1
 
-
-@admin.register(Workout)
+# Admin classes
 class WorkoutAdmin(admin.ModelAdmin):
     list_display = ('user', 'date', 'duration')
-    list_filter = ('date',)
-    search_fields = ('user__username',)
+    search_fields = ('user__username', 'date')
+    inlines = [WorkoutExerciseInline]
 
+class ExerciseAdmin(admin.ModelAdmin):
+    list_display = ('name', 'category', 'calories_burned_per_hour')
+    search_fields = ('name',)
 
-@admin.register(WorkoutExercise)
-class WorkoutExerciseAdmin(admin.ModelAdmin):
-    list_display = ('workout', 'exercise', 'sets', 'reps', 'weight')
-    list_filter = ('workout', 'exercise')
-
-
-@admin.register(Food)
 class FoodAdmin(admin.ModelAdmin):
     list_display = ('name', 'calories', 'protein', 'carbs', 'fats')
     search_fields = ('name',)
 
-
-@admin.register(Meal)
 class MealAdmin(admin.ModelAdmin):
     list_display = ('user', 'date', 'meal_type')
-    list_filter = ('meal_type', 'date')
-    search_fields = ('user__username',)
+    search_fields = ('user__username', 'date')
+    inlines = [MealFoodInline]
 
-
-@admin.register(MealFood)
-class MealFoodAdmin(admin.ModelAdmin):
-    list_display = ('meal', 'food', 'quantity')
-    list_filter = ('meal', 'food')
-
-
-@admin.register(HealthMetrics)
 class HealthMetricsAdmin(admin.ModelAdmin):
-    list_display = ('user', 'date', 'weight', 'body_fat_percentage', 'blood_pressure_systolic', 'blood_pressure_diastolic', 'heart_rate')
-    list_filter = ('date', 'user')
+    list_display = ('user', 'date', 'weight', 'body_fat_percentage',
+                    'blood_pressure_systolic', 'blood_pressure_diastolic', 'heart_rate')
+    search_fields = ('user__username', 'date')
+
+# Register your models here
+admin.site.register(Exercise, ExerciseAdmin)
+admin.site.register(Workout, WorkoutAdmin)
+admin.site.register(Food, FoodAdmin)
+admin.site.register(Meal, MealAdmin)
+admin.site.register(HealthMetrics, HealthMetricsAdmin)
