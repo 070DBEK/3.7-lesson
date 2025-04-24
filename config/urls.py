@@ -21,5 +21,8 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('users.urls')),
-    path('api/', include('fitness.urls')),
+    path('api/', include('meals.urls')),
+    path('api/', include('workouts.urls')),
+    path('api/', include('exercises.urls')),
+    path('api/', include('health_metrics.urls')),
 ]
