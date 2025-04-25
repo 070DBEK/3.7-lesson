@@ -1,5 +1,4 @@
-from rest_framework import viewsets, filters
-from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import viewsets
 from .models import Workout
 from .serializers import WorkoutSerializer
 from rest_framework.permissions import IsAuthenticated

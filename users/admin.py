@@ -1,35 +1,22 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from .models import User, UserProfile
 
 
-class CustomUserAdmin(UserAdmin):
-    model = User
-    list_display = ('username', 'email', 'date_of_birth', 'gender', 'is_staff', 'is_active')
-    search_fields = ('username', 'email')
-    list_filter = ('gender', 'is_staff', 'is_active')
-    ordering = ('username',)
-
-    fieldsets = (
-        (None, {'fields': ('username', 'password')}),
-        ('Personal Info', {'fields': ('email', 'date_of_birth', 'gender')}),
-        ('Permissions', {'fields': ('is_staff', 'is_active', 'is_superuser', 'groups', 'user_permissions')}),
-        ('Important dates', {'fields': ('last_login', 'date_joined')}),
-    )
-
-    add_fieldsets = (
-        (None, {
-            'classes': ('wide',),
-            'fields': ('username', 'email', 'date_of_birth', 'gender', 'password1', 'password2', 'is_staff', 'is_active'),
+@admin.register(User)
+class UserAdmin(BaseUserAdmin):
+    fieldsets = BaseUserAdmin.fieldsets + (
+        ('Additional Info', {
+            'fields': ('date_of_birth', 'gender'),
         }),
     )
+    list_display = ('username', 'email', 'first_name', 'last_name', 'gender', 'date_of_birth', 'is_staff')
+    list_filter = ('gender', 'is_staff', 'is_superuser')
+    search_fields = ('username', 'email', 'first_name', 'last_name')
 
-admin.site.register(User, CustomUserAdmin)
 
-
+@admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'activity_level', 'goal', 'height', 'weight')
+    list_display = ('user', 'height', 'weight', 'activity_level', 'goal')
+    list_filter = ('activity_level', 'goal')
     search_fields = ('user__username', 'user__email')
-    list_filter = ('activity_level',)
-
-admin.site.register(UserProfile, UserProfileAdmin)
