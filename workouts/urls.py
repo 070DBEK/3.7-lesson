@@ -8,5 +8,5 @@ router.register(r'workouts', WorkoutViewSet)
 
 # URLConf
 urlpatterns = [
-    path('workouts/', include(router.urls)),
+    path('', include(router.urls)),
 ]

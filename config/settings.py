@@ -118,23 +118,22 @@ STATIC_URL = 'static/'  # URL for static files
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-# Django REST Framework settings
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',  # JWT authentication
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
 
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',  # Pagination settings
-    'PAGE_SIZE': 10,  # Default number of items per page
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
 
     'DEFAULT_FILTER_BACKENDS': [
-        'django_filters.rest_framework.DjangoFilterBackend'  # Django Filters support
+        'django_filters.rest_framework.DjangoFilterBackend'
     ],
 }
 
-# Simple JWT settings for token expiration and refresh settings
+
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),  # Access token expiration time
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),  # Refresh token expiration time
-    'ROTATE_REFRESH_TOKENS': True,  # Whether to rotate refresh tokens
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': True,
 }

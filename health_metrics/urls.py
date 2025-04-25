@@ -6,5 +6,5 @@ router = DefaultRouter()
 router.register(r'health-metrics', HealthMetricsViewSet)
 
 urlpatterns = [
-    path('health-metrics/', include(router.urls)),
+    path('', include(router.urls)),
 ]

@@ -10,7 +10,7 @@ class Workout(models.Model):
     exercises = models.ManyToManyField(Exercise, through='WorkoutExercise')
 
     def __str__(self):
-        return f'{self.user.username} workout on {self.date}'
+        return f"{self.user.username} - {self.date}"
 
 
 class WorkoutExercise(models.Model):
