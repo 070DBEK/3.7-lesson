@@ -8,6 +8,5 @@ class ExerciseSerializer(serializers.ModelSerializer):
         read_only_fields = ['user']
 
     def create(self, validated_data):
-        # Avtomatik tarzda foydalanuvchini qo‘shish
         validated_data['user'] = self.context['request'].user
         return super().create(validated_data)

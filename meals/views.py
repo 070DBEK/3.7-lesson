@@ -1,36 +1,36 @@
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from .models import Meal, Food
-from .serializers import MealSerializer, CreateMealSerializer, FoodSerializer, FoodUpdateSerializer
+from .serializers import MealSerializer, FoodSerializer
+from command.permissions import IsOwnerOrReadOnly
 
-# Food uchun ViewSet
+
 class FoodViewSet(viewsets.ModelViewSet):
     queryset = Food.objects.all()
     serializer_class = FoodSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
     def get_queryset(self):
         queryset = Food.objects.all()
-        # Agar kerak bo'lsa, maxsus filtrlashlar qo'shish mumkin
         return queryset
 
-# Meal uchun ViewSet
+
 class MealViewSet(viewsets.ModelViewSet):
     queryset = Meal.objects.all()
     serializer_class = MealSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_serializer_class(self):
-        # Agar POST request bo'lsa, CreateMealSerializer ishlatiladi
-        if self.action == 'create':
-            return CreateMealSerializer
-        return MealSerializer
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
     def get_queryset(self):
-        # Foydalanuvchining meal-larini olish
         user = self.request.user
-        return Meal.objects.filter(user=user)
+        date = self.request.query_params.get('date', None)
+        meal_type = self.request.query_params.get('meal_type', None)
+        queryset = Meal.objects.filter(user=user)
+        if date:
+            queryset = queryset.filter(date=date)
+        if meal_type:
+            queryset = queryset.filter(meal_type=meal_type)
+        return queryset
 
     def perform_create(self, serializer):
-        # Meal yaratishda foydalanuvchi bilan bog'lash
         serializer.save(user=self.request.user)
+

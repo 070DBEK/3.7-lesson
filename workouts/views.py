@@ -2,12 +2,14 @@ from rest_framework import viewsets, permissions
 from .models import Workout
 from .serializers import WorkoutSerializer
 from command.permissions import IsOwnerOrReadOnly
+from command.pagination import CustomPagination
 
 
 class WorkoutViewSet(viewsets.ModelViewSet):
     queryset = Workout.objects.all()
     serializer_class = WorkoutSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
+    pagination_class =  CustomPagination
     filterset_fields = ['date']
     search_fields = ['workout_exercises__exercise__name']
 

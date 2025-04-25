@@ -1,7 +1,6 @@
 from django.db import models
 from django.conf import settings
 
-
 class Food(models.Model):
     name = models.CharField(max_length=100)
     calories = models.PositiveIntegerField()
@@ -29,7 +28,7 @@ class Meal(models.Model):
 
 
 class MealFood(models.Model):
-    meal = models.ForeignKey(Meal, on_delete=models.CASCADE)
+    meal = models.ForeignKey(Meal, on_delete=models.CASCADE, related_name='meal_foods')  # related_name qo'shildi
     food = models.ForeignKey(Food, on_delete=models.CASCADE)
     quantity = models.DecimalField(max_digits=6, decimal_places=2)
 

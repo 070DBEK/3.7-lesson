@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import Food, Meal, MealFood
+from .models import Meal, Food, MealFood
+
 
 class FoodSerializer(serializers.ModelSerializer):
     class Meta:
@@ -8,37 +9,43 @@ class FoodSerializer(serializers.ModelSerializer):
 
 
 class MealFoodSerializer(serializers.ModelSerializer):
-    food = FoodSerializer()  # Nested serializer to display food details
+    food = FoodSerializer(read_only=True)
+    food_id = serializers.PrimaryKeyRelatedField(queryset=Food.objects.all(), write_only=True, source='food')
 
     class Meta:
         model = MealFood
-        fields = ['food', 'quantity']
-
+        fields = ['food', 'food_id', 'quantity']
 
 class MealSerializer(serializers.ModelSerializer):
-    foods = MealFoodSerializer(many=True)  # List of foods with their quantity
+    foods = MealFoodSerializer(many=True, source='meal_foods')
 
     class Meta:
         model = Meal
-        fields = ['id', 'user', 'date', 'meal_type', 'foods']
-
-
-class CreateMealSerializer(serializers.ModelSerializer):
-    foods = MealFoodSerializer(many=True)  # List of foods and their quantity
-
-    class Meta:
-        model = Meal
-        fields = ['id', 'user', 'date', 'meal_type', 'foods']
+        fields = ['id', 'date', 'meal_type', 'foods']
 
     def create(self, validated_data):
-        foods_data = validated_data.pop('foods')
+        foods_data = validated_data.pop('meal_foods', [])
         meal = Meal.objects.create(**validated_data)
-        for food_data in foods_data:
-            MealFood.objects.create(meal=meal, **food_data)
+
+        for food_item in foods_data:
+            MealFood.objects.create(
+                meal=meal,
+                food=food_item['food'],
+                quantity=food_item['quantity']
+            )
         return meal
 
-
-class FoodUpdateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Food
-        fields = ['name', 'calories', 'protein', 'carbs', 'fats']
+    def update(self, instance, validated_data):
+        foods_data = validated_data.pop('meal_foods', None)
+        instance.date = validated_data.get('date', instance.date)
+        instance.meal_type = validated_data.get('meal_type', instance.meal_type)
+        instance.save()
+        if foods_data is not None:
+            instance.meal_foods.all().delete()
+            for food_item in foods_data:
+                MealFood.objects.create(
+                    meal=instance,
+                    food=food_item['food'],
+                    quantity=food_item['quantity']
+                )
+        return instance
