@@ -16,6 +16,7 @@ class MealFoodSerializer(serializers.ModelSerializer):
         model = MealFood
         fields = ['food', 'food_id', 'quantity']
 
+
 class MealSerializer(serializers.ModelSerializer):
     foods = MealFoodSerializer(many=True, source='meal_foods')
 

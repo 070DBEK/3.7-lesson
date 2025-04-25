@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from .models import HealthMetrics
-from users.models import User
 
 
 class HealthMetricsSerializer(serializers.ModelSerializer):
@@ -16,11 +15,7 @@ class HealthMetricsSerializer(serializers.ModelSerializer):
             'heart_rate',
         ]
 
-    # Response formatni moslashtirish
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        # Qo'shimcha tahrirlar qilish mumkin, masalan, sana formatlash
-        representation['date'] = instance.date.strftime('%Y-%m-%d')  # Sana formatlash
+        representation['date'] = instance.date.strftime('%Y-%m-%d')
         return representation
-
-    # To'liq Response ni moslashtirish uchun `to_representation` metodini ishlatamiz.

@@ -1,4 +1,3 @@
-# serializers.py
 from rest_framework import serializers
 from .models import Workout, WorkoutExercise
 
@@ -8,7 +7,14 @@ class WorkoutExerciseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = WorkoutExercise
-        fields = ['id', 'exercise', 'name', 'sets', 'reps', 'weight']
+        fields = [
+            'id',
+            'exercise',
+            'name',
+            'sets',
+            'reps',
+            'weight'
+        ]
 
 
 class WorkoutSerializer(serializers.ModelSerializer):

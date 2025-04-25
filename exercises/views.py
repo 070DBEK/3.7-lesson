@@ -1,7 +1,8 @@
-from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated
+from rest_framework import viewsets, filters
+from django_filters.rest_framework import DjangoFilterBackend
 from .models import Exercise
 from .serializers import ExerciseSerializer
+from rest_framework.permissions import IsAuthenticated
 from command.permissions import IsOwnerOrReadOnly
 from command.pagination import CustomPagination
 
@@ -11,7 +12,9 @@ class ExerciseViewSet(viewsets.ModelViewSet):
     serializer_class = ExerciseSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
     pagination_class =  CustomPagination
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_fields = ['date']
+    search_fields = ['workout_exercises__exercise__name']
 
-
-    def get_queryset(self):
+def get_queryset(self):
         return Exercise.objects.filter(user=self.request.user)
