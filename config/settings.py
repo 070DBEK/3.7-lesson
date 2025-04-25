@@ -16,7 +16,6 @@ from datetime import timedelta
 # Base directory path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Secret key used for cryptographic signing (keep it safe in production)
 SECRET_KEY = 'django-insecure-ju40p#mi_rqh94gwc^76!p(ew6wffgt7c4-_fe9a(89g=u0g*i'
 
 # Debug mode, should be set to False in production
@@ -25,53 +24,53 @@ DEBUG = True
 # Allowed hosts for the application (list of domain names or IP addresses)
 ALLOWED_HOSTS = []
 
-# Define the custom user model for the application
+
 AUTH_USER_MODEL = "users.User"
 
-# List of installed applications in the project
+
 INSTALLED_APPS = [
-    'django.contrib.admin',  # Django admin interface
-    'django.contrib.auth',  # User authentication
-    'django.contrib.contenttypes',  # Content type framework for models
-    'django.contrib.sessions',  # Session management
-    'django.contrib.messages',  # Messaging framework
-    'django.contrib.staticfiles',  # Static file management
-    'rest_framework',  # Django REST framework for API development
-    'rest_framework_simplejwt',  # JWT Authentication for REST API
-    'django_filters',  # Django filters to use with REST framework
-    'users',  # Custom user app
-    'exercises',  # App for exercises
-    'health_metrics',  # Health metrics app
-    'meals',  # Meals app
-    'workouts'  # Workouts app
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework_simplejwt',
+    'django_filters',
+    'users',
+    'exercises',
+    'health_metrics',
+    'meals',
+    'workouts'
 ]
 
 # Middleware for handling requests and responses
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',  # For secure HTTP headers
-    'django.contrib.sessions.middleware.SessionMiddleware',  # For session management
-    'django.middleware.common.CommonMiddleware',  # For common middleware tasks
-    'django.middleware.csrf.CsrfViewMiddleware',  # CSRF protection
-    'django.contrib.auth.middleware.AuthenticationMiddleware',  # User authentication
-    'django.contrib.messages.middleware.MessageMiddleware',  # Message handling
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',  # Clickjacking protection
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
 # Root URL configuration for the project
 ROOT_URLCONF = 'config.urls'
 
-# Template settings for rendering HTML templates (if used)
+
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',  # Django template engine
-        'DIRS': [],  # List of directories for custom templates
-        'APP_DIRS': True,  # Look for templates in each app’s templates directory
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
-                'django.template.context_processors.debug',  # Debugging context processor
-                'django.template.context_processors.request',  # Request context processor
-                'django.contrib.auth.context_processors.auth',  # User authentication context
-                'django.contrib.messages.context_processors.messages',  # Messages context
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
             ],
         },
     },
@@ -84,37 +83,38 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database configuration (SQLite used here, can be changed for production)
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',  # Database engine (SQLite in development)
-        'NAME': BASE_DIR / 'db.sqlite3',  # Database file location
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
 # Password validation settings
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',  # Password similarity validator
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',  # Password length validator
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',  # Common password validator
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',  # Numeric password validator
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
 
 # Internationalization settings
-LANGUAGE_CODE = 'en-us'  # Language code for the project
-TIME_ZONE = 'UTC'  # Time zone for the project
-USE_I18N = True  # Enable internationalization support
-USE_TZ = True  # Enable timezone support
+LANGUAGE_CODE = 'en-us'
 
-# Static file settings (for serving static content like CSS, JS, images)
-STATIC_URL = 'static/'  # URL for static files
+TIME_ZONE = 'UTC'
 
-# Default auto field type for primary keys
+USE_I18N = True
+
+USE_TZ = True
+
+STATIC_URL = 'static/'
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 

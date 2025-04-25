@@ -2,7 +2,7 @@ from rest_framework import viewsets, filters
 from rest_framework.permissions import IsAuthenticated
 from .models import HealthMetrics
 from .serializers import HealthMetricsSerializer
-from command.permissions import IsOwnerOrReadOnly
+# from command.permissions import IsOwnerOrReadOnly
 from command.pagination import CustomPagination
 from rest_framework.filters import OrderingFilter
 
@@ -10,7 +10,7 @@ from rest_framework.filters import OrderingFilter
 class HealthMetricsViewSet(viewsets.ModelViewSet):
     queryset = HealthMetrics.objects.all()
     serializer_class = HealthMetricsSerializer
-    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+    permission_classes = [IsAuthenticated]
     pagination_class = CustomPagination
     filter_backends = [OrderingFilter, filters.SearchFilter]
     ordering_fields = ['date', 'weight', 'body_fat_percentage']

@@ -12,9 +12,6 @@ class ExerciseViewSet(viewsets.ModelViewSet):
     serializer_class = ExerciseSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
     pagination_class =  CustomPagination
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    filterset_fields = ['date']
-    search_fields = ['workout_exercises__exercise__name']
 
-def get_queryset(self):
+    def get_queryset(self):
         return Exercise.objects.filter(user=self.request.user)
